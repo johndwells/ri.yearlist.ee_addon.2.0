@@ -82,6 +82,17 @@ class Yearlist
 		{
 			$category = 'all';
 		}                                              
+		// ---------------------------
+		// get the year sort parameter
+		// ---------------------------
+		if ($this->EE->TMPL->fetch_param('sort') !=false)
+		{
+			$sort = $this->EE->TMPL->fetch_param('sort');
+		}
+		else
+		{
+			$sort = 'desc';
+		}                                              
 		
 		// ---------------------------
 		// Query the database
@@ -108,7 +119,7 @@ class Yearlist
 		
 		if ($category == 'all')
 		{
-			$this->EE->db->select('year')->distinct()->from('exp_channel_titles')->where('channel_id', $channel)->order_by('year', 'desc');			
+			$this->EE->db->select('year')->distinct()->from('exp_channel_titles')->where('channel_id', $channel)->order_by('year', $sort);		
 		}
 		else
 		{
@@ -119,7 +130,7 @@ class Yearlist
 			// ---------------------------------------------------                               
 			$wheres = array('exp_channel_titles.channel_id' => $channel, 'exp_category_posts.cat_id' => $category);
 			
-			$this->EE->db->select('exp_channel_titles.year')->distinct()->from('exp_channel_titles')->join('exp_category_posts', 'exp_channel_titles.entry_id = exp_category_posts.entry_id', 'inner')->where($wheres)->order_by('year', 'desc');
+			$this->EE->db->select('exp_channel_titles.year')->distinct()->from('exp_channel_titles')->join('exp_category_posts', 'exp_channel_titles.entry_id = exp_category_posts.entry_id', 'inner')->where($wheres)->order_by('year', $sort);
 		}
 
 		// do the query 
@@ -161,7 +172,7 @@ class Yearlist
 ?>
 The Year Listing plugin is a simple way to get a distinct 4 digit year for your entries. This way you can list out years for archives.
 
-{exp:yearlist channel="yourchannel" category="1"}
+{exp:yearlist channel="yourchannel" category="1" sort="desc"}
 
 {year}
 
@@ -171,6 +182,7 @@ That will return an array of years. Use {year} to print them to the screen and w
 
 The category parameter is optional and if you leave it out, the plugin will search across all categories. There is currently no support for having multiple categories in the category parameter (e.g. category="3|8|10"). This may come later.
 
+The sort parameter is optional and if you leave it out, the plugin will return the years in descending order.
 <?php
 		$buffer = ob_get_contents();
 		ob_end_clean(); 
