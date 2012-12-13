@@ -93,6 +93,20 @@ class Yearlist
 		{
 			$sort = 'desc';
 		}                                              
+		// ---------------------------
+		// get the status parameter
+		// ---------------------------
+		if ($this->EE->TMPL->fetch_param('status') !=false)
+		{
+			$status = $this->EE->TMPL->fetch_param('status');
+
+			// multiple?
+			$status = preg_split("/[\|,]/", $status );
+		}
+		else
+		{
+			$status = false;
+		}                                              
 		
 		// ---------------------------
 		// Query the database
@@ -131,6 +145,12 @@ class Yearlist
 			$wheres = array('exp_channel_titles.channel_id' => $channel, 'exp_category_posts.cat_id' => $category);
 			
 			$this->EE->db->select('exp_channel_titles.year')->distinct()->from('exp_channel_titles')->join('exp_category_posts', 'exp_channel_titles.entry_id = exp_category_posts.entry_id', 'inner')->where($wheres)->order_by('year', $sort);
+		}
+
+		// status?
+		if($status)
+		{
+			$this->EE->db->where_in('status', $status);
 		}
 
 		// do the query 
@@ -183,6 +203,9 @@ That will return an array of years. Use {year} to print them to the screen and w
 The category parameter is optional and if you leave it out, the plugin will search across all categories. There is currently no support for having multiple categories in the category parameter (e.g. category="3|8|10"). This may come later.
 
 The sort parameter is optional and if you leave it out, the plugin will return the years in descending order.
+
+The status parameter is optional and if you leave it out, it will query ANY status. Separate multiple statuses with either a pipe or comma.
+
 <?php
 		$buffer = ob_get_contents();
 		ob_end_clean(); 
